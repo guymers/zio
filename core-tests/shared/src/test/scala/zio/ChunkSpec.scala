@@ -512,6 +512,34 @@ object ChunkSpec extends ZIOBaseSpec {
       assert(Chunk(1, 2, 3).zipAllWith(Chunk(3, 2))(_ => 0, _ => 0)(_ + _))(equalTo(Chunk(4, 4, 0))) &&
       assert(Chunk(1, 2).zipAllWith(Chunk(3, 2, 1))(_ => 0, _ => 0)(_ + _))(equalTo(Chunk(4, 4, 0)))
     },
+    suite("zipWithIndex")(
+      test("single part chunk") {
+        val c = Chunk("a", "b", "c")
+        assert(Chunk.empty.zipWithIndex)(equalTo(Chunk.empty)) &&
+        assert(c.zipWithIndex)(equalTo(Chunk(("a", 0), ("b", 1), ("c", 2))))
+      },
+      test("multiple part chunk") {
+        val c = Chunk("a") ++ Chunk("b") ++ Chunk("c")
+        assert(Chunk.empty.zipWithIndex)(equalTo(Chunk.empty)) &&
+        assert(c.zipWithIndex)(equalTo(Chunk(("a", 0), ("b", 1), ("c", 2))))
+      }
+    ),
+    suite("zipWithIndexFrom")(
+      test("single part chunk") {
+        val c = Chunk("a", "b", "c", "d", "e", "f")
+        assert(c.zipWithIndexFrom(0))(equalTo(Chunk(("a", 0), ("b", 1), ("c", 2), ("d", 3), ("e", 4), ("f", 5)))) &&
+        assert(c.zipWithIndexFrom(3))(equalTo(Chunk(("d", 3), ("e", 4), ("f", 5)))) &&
+        assert(c.zipWithIndexFrom(5))(equalTo(Chunk(("f", 5)))) &&
+        assert(c.zipWithIndexFrom(6))(equalTo(Chunk.empty))
+      },
+      test("multiple part chunk") {
+        val c = Chunk("a", "b") ++ Chunk("c", "d") ++ Chunk("e", "f")
+        assert(c.zipWithIndexFrom(0))(equalTo(Chunk(("a", 0), ("b", 1), ("c", 2), ("d", 3), ("e", 4), ("f", 5)))) &&
+        assert(c.zipWithIndexFrom(3))(equalTo(Chunk(("d", 3), ("e", 4), ("f", 5)))) &&
+        assert(c.zipWithIndexFrom(5))(equalTo(Chunk(("f", 5)))) &&
+        assert(c.zipWithIndexFrom(6))(equalTo(Chunk.empty))
+      }
+    ),
     test("partitionMap") {
       val as       = Chunk(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
       val (bs, cs) = as.partitionMap(n => if (n % 2 == 0) Left(n) else Right(n))

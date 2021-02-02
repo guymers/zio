@@ -57,6 +57,13 @@ object NonEmptyChunkSpec extends ZIOBaseSpec {
         assert(actual)(equalTo(expected))
       }
     },
+    testM("zipWithIndex") {
+      check(genNonEmptyChunk) { as =>
+        val actual   = as.zipWithIndex
+        val expected = as.zip(0 until as.size)
+        assert(Some(actual))(equalTo(NonEmptyChunk.fromChunk(expected)))
+      }
+    },
     suite("unapplySeq")(
       test("matches a nonempty chunk") {
         val chunk = Chunk(1, 2, 3)

@@ -984,15 +984,20 @@ sealed abstract class Chunk[+A] extends ChunkLike[A] { self =>
   final def zipWithIndexFrom(indexOffset: Int): Chunk[(A, Int)] = {
     val iterator = arrayIterator
     val builder  = ChunkBuilder.make[(A, Int)]()
-    builder.sizeHint(length)
+    builder.sizeHint((length - indexOffset).min(length).max(0))
+    var pos = 0
     while (iterator.hasNext) {
       val array  = iterator.next()
       val length = array.length
-      var i      = indexOffset
+      var i      = (indexOffset - pos).max(0)
+      if (i > 0) {
+        pos += i.min(length)
+      }
       while (i < length) {
         val a = array(i)
-        builder += ((a, i))
+        builder += ((a, pos))
         i += 1
+        pos += 1
       }
     }
     builder.result()
