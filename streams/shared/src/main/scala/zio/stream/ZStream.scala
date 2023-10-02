@@ -28,7 +28,8 @@ import java.io.{IOException, InputStream}
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
-final class ZStream[-R, +E, +A] private (val channel: ZChannel[R, Any, Any, Any, E, Chunk[A], Any]) { self =>
+final class ZStream[-R, +E, +A] private (val channel: ZChannel[R, Any, Any, Any, E, Chunk[A], Any])
+  extends ZStreamVersionSpecific[R, E, A] { self =>
 
   import ZStream.HaltStrategy
 
@@ -3978,7 +3979,7 @@ final class ZStream[-R, +E, +A] private (val channel: ZChannel[R, Any, Any, Any,
     self >>> ZPipeline.zipWithPreviousAndNext
 }
 
-object ZStream extends ZStreamPlatformSpecificConstructors {
+object ZStream extends ZStreamPlatformSpecificConstructors with ZStreamVersionSpecificConstructors {
 
   /**
    * The default chunk size used by the various combinators and constructors of
